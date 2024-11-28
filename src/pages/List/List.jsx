@@ -31,6 +31,21 @@ const List = ({ url }) => {
     }
   };
 
+  const toggleStock = async (id) => {
+    try {
+      const response = await axios.post(`${url}/api/food/toggle-stock`, { id });
+      if (response.data.success) {
+        toast.success("Stock status updated");
+        fetchList(); // Refresh the list
+      } else {
+        toast.error("Failed to update stock status");
+      }
+    } catch (error) {
+      console.error("Error updating stock status:", error);
+      toast.error("Error updating stock status");
+    }
+  };
+
   useEffect(() => {
     fetchList();
   }, []);
@@ -38,19 +53,16 @@ const List = ({ url }) => {
   return (
     <div className="list">
       <h3>Food List</h3>
-      <div className="list-table-format title">
-        <span>Image</span>
-        <span>Name</span>
-        <span>Category</span>
-        <span>Price</span>
-        <span>Action</span>
-      </div>
       {list.map((item) => (
         <div key={item._id} className="list-table-format">
           <img src={`${url}/images/${item.image}`} alt={item.name} />
           <span>{item.name}</span>
           <span>{item.category}</span>
           <span>${item.price}</span>
+          <span>{item.inStock ? "In Stock" : "Out of Stock"}</span>
+          <button className="cursor" onClick={() => toggleStock(item._id)}>
+            {item.inStock ? "Mark Out of Stock" : "Mark In Stock"}
+          </button>
           <button className="cursor" onClick={() => removeFood(item._id)}>
             Remove
           </button>
